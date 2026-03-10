@@ -47,14 +47,44 @@ if (memberForm) {
 
         members.forEach((member, index) => {
 
+            let status = "-";
+            let color = "black";
+
+            if (member.endDate) {
+
+                let today = new Date();
+                let endDate = new Date(member.endDate);
+
+                let diffTime = endDate - today;
+                let daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                if (daysLeft < 0) {
+                    status = "Expired";
+                    color = "red";
+                }
+                else if (daysLeft <= 7) {
+                    status = "Expiring Soon";
+                    color = "orange";
+                }
+                else {
+                    status = "Active";
+                    color = "green";
+                }
+
+            }
+
             let row = document.createElement("tr");
 
             row.innerHTML = `
 <td>${member.name}</td>
 <td>${member.phone}</td>
 <td>${member.plan}</td>
-<td>${member.startDate}</td>
-<td>${member.endDate}</td>
+<td>${member.startDate || "-"}</td>
+<td>${member.endDate || "-"}</td>
+
+<td style="color:${color}; font-weight:bold;">
+${status}
+</td>
 
 <td class="actions">
 <button class="edit-btn" onclick="editMember(${index})">✏️</button>
@@ -91,6 +121,7 @@ if (memberForm) {
         if (editIndex === -1) {
 
             members.push({
+                id: Date.now(),
                 name,
                 phone,
                 plan,
@@ -100,13 +131,9 @@ if (memberForm) {
 
         } else {
 
-            members[editIndex] = {
-                name,
-                phone,
-                plan,
-                startDate,
-                endDate
-            };
+            members[editIndex].name = name;
+            members[editIndex].phone = phone;
+            members[editIndex].plan = plan;
 
             editIndex = -1;
 
@@ -145,7 +172,33 @@ if (memberForm) {
     renderMembers();
 
 }
+// MEMBER SEARCH
 
+const memberSearch = document.getElementById("memberSearch");
+
+if (memberSearch) {
+
+    memberSearch.addEventListener("keyup", function () {
+
+        let value = this.value.toLowerCase();
+
+        let rows = document.querySelectorAll("#membersTable tbody tr");
+
+        rows.forEach(row => {
+
+            let name = row.children[0].innerText.toLowerCase();
+
+            if (name.includes(value)) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+
+        });
+
+    });
+
+}
 
 // LOAD PLANS IN MEMBER DROPDOWN
 
@@ -281,6 +334,65 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 });
+// UNPAID MEMBERS COUNT
+
+const unpaidMembers = document.getElementById("unpaidMembers");
+
+if (unpaidMembers) {
+
+    let members = JSON.parse(localStorage.getItem("members")) || [];
+    let payments = JSON.parse(localStorage.getItem("payments")) || [];
+
+    let today = new Date();
+    let month = today.toLocaleString('default', { month: 'long' });
+    let year = today.getFullYear();
+
+    let unpaidCount = 0;
+
+    members.forEach(member => {
+
+        let payment = payments.find(p =>
+            p.member === member.name &&
+            p.month === month &&
+            p.year === year
+        );
+
+        if (!payment || payment.status !== "Paid") {
+            unpaidCount++;
+        }
+
+    });
+
+    unpaidMembers.innerText = unpaidCount;
+
+}
+// MONTHLY REVENUE CALCULATION
+
+const revenueElement = document.getElementById("monthlyRevenue");
+
+if (revenueElement) {
+
+    let payments = JSON.parse(localStorage.getItem("payments")) || [];
+
+    let today = new Date();
+    let month = today.toLocaleString('default', { month: 'long' });
+    let year = today.getFullYear();
+
+    let totalRevenue = 0;
+
+    payments.forEach(payment => {
+
+        if (payment.month === month && payment.year === year) {
+
+            totalRevenue += payment.amount;
+
+        }
+
+    });
+
+    revenueElement.innerText = "₹" + totalRevenue;
+
+}
 // TODAY'S ATTENDANCE COUNT
 
 const todayAttendance = document.getElementById("todayAttendance");
@@ -347,5 +459,244 @@ if (planForm) {
     });
 
     renderPlans();
+
+}
+
+//PAYMENT SYSTEM
+
+
+const paymentForm = document.getElementById("paymentForm");
+
+if (paymentForm) {
+
+    let payments = JSON.parse(localStorage.getItem("payments")) || [];
+    let members = JSON.parse(localStorage.getItem("members")) || [];
+    let plans = JSON.parse(localStorage.getItem("plans")) || [];
+
+    const paymentMember = document.getElementById("paymentMember");
+    const paymentPlan = document.getElementById("paymentPlan");
+    const paymentAmount = document.getElementById("paymentAmount");
+    const tableBody = document.querySelector("#paymentsTable tbody");
+
+
+    // LOAD MEMBERS
+    members.forEach(member => {
+
+        let option = document.createElement("option");
+        option.value = member.name;
+        option.textContent = member.name;
+
+        paymentMember.appendChild(option);
+
+    });
+
+
+    // LOAD PLANS
+    plans.forEach(plan => {
+
+        let option = document.createElement("option");
+        option.value = plan.name;
+        option.textContent = plan.name;
+
+        paymentPlan.appendChild(option);
+
+    });
+
+
+    // MEMBER CHANGE → AUTO PLAN + PRICE
+    paymentMember.addEventListener("change", function () {
+
+        let selectedMember = paymentMember.value;
+
+        let memberData = members.find(m => m.name === selectedMember);
+
+        if (memberData) {
+
+            paymentPlan.value = memberData.plan;
+
+            let planData = plans.find(p => p.name === memberData.plan);
+
+            if (planData) {
+                paymentAmount.value = planData.price;
+            }
+
+        }
+
+    });
+
+
+    // RENDER TABLE
+    function renderPayments() {
+
+        tableBody.innerHTML = "";
+
+        payments.forEach(payment => {
+
+            let color = "green";
+
+            if (payment.status === "Partial") color = "orange";
+            if (payment.status === "Unpaid") color = "red";
+
+            let row = document.createElement("tr");
+
+            row.innerHTML = `
+<td>${payment.member}</td>
+<td>${payment.plan}</td>
+<td>${payment.month} ${payment.year}</td>
+<td>₹${payment.amount}</td>
+<td style="color:${color};font-weight:bold;">${payment.status}</td>
+<td style="color:red;font-weight:bold;">₹${payment.due}</td>
+`;
+
+            tableBody.appendChild(row);
+
+        });
+
+    }
+
+
+    // RECORD PAYMENT
+    paymentForm.addEventListener("submit", function (e) {
+
+        e.preventDefault();
+
+        let member = paymentMember.value;
+        let plan = paymentPlan.value;
+        let amountPaid = parseInt(paymentAmount.value) || 0;
+
+        if (member === "" || plan === "") {
+            alert("Select member");
+            return;
+        }
+
+        let today = new Date();
+        let month = today.toLocaleString('default', { month: 'long' });
+        let year = today.getFullYear();
+
+        let planData = plans.find(p => p.name === plan);
+        let planPrice = parseInt(planData.price);
+
+
+        // FIND PAYMENT FOR SAME MONTH
+        let payment = payments.find(p =>
+            p.member === member &&
+            p.month === month &&
+            p.year === year
+        );
+
+
+        // IF RECORD EXISTS
+        if (payment) {
+
+            // already paid
+            if (payment.due === 0) {
+                alert("Payment already completed for this month");
+                return;
+            }
+
+            // cannot pay more than due
+            if (amountPaid > payment.due) {
+                alert("You can only pay remaining due: ₹" + payment.due);
+                return;
+            }
+
+            // update partial payment
+            payment.amount += amountPaid;
+
+            payment.due = planPrice - payment.amount;
+
+            if (payment.due === 0) {
+                payment.status = "Paid";
+            } else {
+                payment.status = "Partial";
+            }
+
+        } else {
+
+            // CREATE NEW PAYMENT
+
+            let due = planPrice - amountPaid;
+
+            let status = "Paid";
+
+            if (amountPaid === 0) {
+                status = "Unpaid";
+                due = planPrice;
+            }
+            else if (amountPaid < planPrice) {
+                status = "Partial";
+            }
+
+            payments.push({
+                member: member,
+                plan: plan,
+                month: month,
+                year: year,
+                amount: amountPaid,
+                due: due,
+                status: status
+            });
+
+        }
+
+        localStorage.setItem("payments", JSON.stringify(payments));
+
+        renderPayments();
+
+        paymentForm.reset();
+
+    });
+
+
+    renderPayments();
+
+}
+// REVENUE CHART
+
+const revenueChartCanvas = document.getElementById("revenueChart");
+
+if (revenueChartCanvas) {
+
+    let payments = JSON.parse(localStorage.getItem("payments")) || [];
+
+    let monthlyRevenue = {};
+
+    payments.forEach(payment => {
+
+        let key = payment.month + " " + payment.year;
+
+        if (!monthlyRevenue[key]) {
+            monthlyRevenue[key] = 0;
+        }
+
+        monthlyRevenue[key] += payment.amount;
+
+    });
+
+    let labels = Object.keys(monthlyRevenue);
+    let data = Object.values(monthlyRevenue);
+
+    new Chart(revenueChartCanvas, {
+
+        type: 'bar',
+
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Monthly Revenue',
+                data: data,
+                borderWidth: 1
+            }]
+        },
+
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+
+    });
 
 }

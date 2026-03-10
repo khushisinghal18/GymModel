@@ -118,13 +118,22 @@ button:hover {
     flex-wrap: wrap;
 }
 
+/*card*/
 .card {
+
     background: white;
     padding: 20px;
     border-radius: 10px;
-    width: 200px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    transition: 0.2s;
+    width: 220px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    transition: 0.3s;
+
+}
+
+.card:hover {
+
+    transform: translateY(-4px);
+
 }
 
 .card:hover {
@@ -209,4 +218,21 @@ table button:last-child {
 
 .delete-btn:hover {
     background: #c0392b;
+}
+
+.chart-container {
+
+    background: white;
+    margin-top: 30px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+
+}
+
+.chart-container h2 {
+
+    margin-bottom: 20px;
+    color: #2c3e50;
+
 }

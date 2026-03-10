@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Payments</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="sidebar">
+
+            <h2>Gym Admin</h2>
+
+            <ul>
+
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="members.html">Members</a></li>
+                <li><a href="attendance.html">Attendance</a></li>
+                <li><a href="payments.html">Payments</a></li>
+                <li><a href="trainers.html">Trainers</a></li>
+                <li><a href="plans.html">Plans</a></li>
+                <li><a href="store.html">Store</a></li>
+
+            </ul>
+
+        </div>
+
+        <div class="main">
+
+            <h1>Payments</h1>
+
+            <form id="paymentForm">
+
+                <select id="paymentMember" required>
+                    <option value="">Select Member</option>
+                </select>
+
+                <select id="paymentPlan" disabled>
+                    <option value="">Plan</option>
+                </select>
+
+                <input type="number" id="paymentAmount" placeholder="Amount Paid">
+
+                <button type="submit">Record Payment</button>
+
+            </form>
+
+            <table id="paymentsTable">
+
+                <thead>
+                    <tr>
+                        <th>Member</th>
+                        <th>Plan</th>
+                        <th>Month</th>
+                        <th>Amount Paid</th>
+                        <th>Status</th>
+                        <th>Due</th>
+                    </tr>
+                </thead>
+
+
+
+                <tbody>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <script src="../js/script.js"></script>
+
+</body>
+
+</html>

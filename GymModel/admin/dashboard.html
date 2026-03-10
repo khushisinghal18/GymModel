@@ -6,6 +6,8 @@
     <title>Admin Dashboard</title>
 
     <link rel="stylesheet" href="../css/style.css">
+    <!--chart-->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
 
@@ -49,17 +51,27 @@
 
                 <div class="card">
                     <h3>Monthly Revenue</h3>
-                    <p>$5000</p>
+                    <p id="monthlyRevenue">0</p>
                 </div>
 
                 <div class="card">
                     <h3>Active Trainers</h3>
                     <p>8</p>
                 </div>
+                <div class="card">
+                    <h3>Unpaid Members</h3>
+                    <p id="unpaidMembers">0</p>
+                </div>
+                <!--chart-->
+                <div class="chart-container"></div>
+                <h2>Revenue Chart</h2>
+
+                <canvas id="revenueChart"></canvas>
 
             </div>
-
         </div>
+
+    </div>
 
     </div>
     <script src="../js/script.js"></script>
