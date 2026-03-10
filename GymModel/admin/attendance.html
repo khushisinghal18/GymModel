@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Attendance</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="sidebar">
+
+            <h2>Gym Admin</h2>
+
+            <ul>
+
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="members.html">Members</a></li>
+                <li><a href="attendance.html">Attendance</a></li>
+                <li><a href="payments.html">Payments</a></li>
+                <li><a href="trainers.html">Trainers</a></li>
+                <li><a href="plans.html">Plans</a></li>
+                <li><a href="store.html">Store</a></li>
+
+            </ul>
+
+        </div>
+
+        <div class="main">
+
+            <h1>Attendance</h1>
+
+            <h3>Mark Attendance</h3>
+
+            <select id="memberSelect"></select>
+
+            <select id="statusSelect">
+                <option value="Present">Present</option>
+                <option value="Absent">Absent</option>
+            </select>
+
+            <button onclick="markAttendance()">Submit</button>
+
+            <h3>Attendance Records</h3>
+
+            <table id="attendanceTable">
+
+                <thead>
+                    <tr>
+                        <th>Member</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <script src="../js/script.js"></script>
+
+</body>
+
+</html>
