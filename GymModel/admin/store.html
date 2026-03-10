@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Gym Store</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="sidebar">
+
+            <h2>Gym Admin</h2>
+
+            <ul>
+
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="members.html">Members</a></li>
+                <li><a href="attendance.html">Attendance</a></li>
+                <li><a href="payments.html">Payments</a></li>
+                <li><a href="trainers.html">Trainers</a></li>
+                <li><a href="plans.html">Plans</a></li>
+                <li><a href="store.html">Store</a></li>
+
+            </ul>
+
+        </div>
+
+        <div class="main">
+
+            <h1>Gym Store</h1>
+
+            <h3>Add Product</h3>
+
+            <form id="productForm">
+
+                <input type="text" id="productName" placeholder="Product Name" required>
+
+                <input type="number" id="productPrice" placeholder="Price" required>
+
+                <input type="number" id="productStock" placeholder="Stock" required>
+
+                <select id="productCategory">
+
+                    <option value="Supplement">Supplement</option>
+                    <option value="Accessory">Accessory</option>
+
+                </select>
+
+                <button type="submit">Add Product</button>
+
+            </form>
+
+
+            <h3>Products</h3>
+
+            <table id="productsTable">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                </tbody>
+
+            </table>
+
+
+            <h3>Record Purchase</h3>
+
+            <select id="purchaseMember">
+                <option value="">Select Member</option>
+            </select>
+
+            <select id="purchaseProduct">
+                <option value="">Select Product</option>
+            </select>
+
+            <input type="number" id="purchaseQuantity" placeholder="Quantity">
+
+            <button onclick="recordPurchase()">Purchase</button>
+
+
+            <h3>Purchase History</h3>
+
+            <table id="purchaseTable">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Member</th>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                        <th>Date</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <script src="../js/script.js"></script>
+
+</body>
+
+</html>

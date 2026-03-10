@@ -3,7 +3,7 @@
 
 <head>
 
-    <title>Payments</title>
+    <title>Trainer Attendance</title>
 
     <link rel="stylesheet" href="../css/style.css">
 
@@ -34,38 +34,41 @@
 
         <div class="main">
 
-            <h1>Payments</h1>
+            <h1>Trainer Attendance</h1>
 
-            <form id="paymentForm">
+            <h3>Mark Attendance</h3>
 
-                <select id="paymentMember" required>
-                    <option value="">Select Member</option>
-                </select>
+            <select id="trainerSelectAttendance">
 
-                <select id="paymentPlan" disabled>
-                    <option value="">Plan</option>
-                </select>
+                <option value="">Select Trainer</option>
 
-                <input type="number" id="paymentAmount" placeholder="Amount Paid">
+            </select>
 
-                <button type="submit">Record Payment</button>
+            <select id="trainerStatus">
 
-            </form>
+                <option value="Present">Present</option>
+                <option value="Absent">Absent</option>
 
-            <table id="paymentsTable">
+            </select>
+
+            <button onclick="markTrainerAttendance()">Submit</button>
+
+            <h3>Attendance Records</h3>
+
+            <table id="trainerAttendanceTable">
 
                 <thead>
+
                     <tr>
-                        <th>Member</th>
-                        <th>Plan</th>
-                        <th>Month</th>
-                        <th>Amount Paid</th>
+
+                        <th>Trainer</th>
                         <th>Status</th>
-                        <th>Due</th>
+                        <th>Date</th>
+                        <th>Time</th>
+
                     </tr>
+
                 </thead>
-
-
 
                 <tbody>
 

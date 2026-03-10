@@ -79,6 +79,7 @@ if (memberForm) {
 <td>${member.name}</td>
 <td>${member.phone}</td>
 <td>${member.plan}</td>
+<td>${member.trainer || "-"}</td>
 <td>${member.startDate || "-"}</td>
 <td>${member.endDate || "-"}</td>
 
@@ -119,12 +120,30 @@ ${status}
         let endDate = endDateObj.toLocaleDateString();
 
         if (editIndex === -1) {
+            let trainer = document.getElementById("trainerSelect").value;
+            let trainers = JSON.parse(localStorage.getItem("trainers")) || [];
 
+            if (trainer) {
+
+                let trainerData = trainers.find(t => t.name === trainer);
+
+                let assignedMembers = members.filter(m => m.trainer === trainer).length;
+
+                if (trainerData && assignedMembers >= trainerData.capacity) {
+
+                    alert("Trainer capacity reached");
+
+                    return;
+
+                }
+
+            }
             members.push({
                 id: Date.now(),
                 name,
                 phone,
                 plan,
+                trainer,
                 startDate,
                 endDate
             });
@@ -221,6 +240,27 @@ if (planSelect) {
     });
 
 }
+
+const trainerSelect = document.getElementById("trainerSelect");
+
+if (trainerSelect) {
+
+    let trainers = JSON.parse(localStorage.getItem("trainers")) || [];
+
+    trainers.forEach(trainer => {
+
+        let option = document.createElement("option");
+
+        option.value = trainer.name;
+
+        option.textContent = trainer.name;
+
+        trainerSelect.appendChild(option);
+
+    });
+
+}
+
 //ATTENDANCE
 const memberSelect = document.getElementById("memberSelect");
 
@@ -652,7 +692,7 @@ if (paymentForm) {
 
 }
 // REVENUE CHART
-
+//chart
 const revenueChartCanvas = document.getElementById("revenueChart");
 
 if (revenueChartCanvas) {
@@ -698,5 +738,448 @@ if (revenueChartCanvas) {
         }
 
     });
+
+}
+
+
+
+// TRAINER MODE
+
+const trainerForm = document.getElementById("trainerForm");
+
+if (trainerForm) {
+
+    let trainers = JSON.parse(localStorage.getItem("trainers")) || [];
+    let members = JSON.parse(localStorage.getItem("members")) || [];
+
+    const tableBody = document.querySelector("#trainersTable tbody");
+
+
+    // RENDER TRAINERS TABLE
+
+    function renderTrainers() {
+
+        tableBody.innerHTML = "";
+
+        trainers.forEach((trainer, index) => {
+
+            let assignedMembers = members
+                .filter(m => m.trainer === trainer.name)
+                .map(m => m.name);
+
+            let assignedCount = assignedMembers.length;
+
+            let row = document.createElement("tr");
+
+            row.innerHTML = `
+
+<td>${trainer.name}</td>
+<td>${trainer.phone}</td>
+<td>${trainer.specialization}</td>
+<td>${trainer.experience} yrs</td>
+<td>${trainer.capacity}</td>
+
+<td>${assignedCount}</td>
+
+<td>${assignedMembers.length ? assignedMembers.join(", ") : "-"}</td>
+
+<td>₹${trainer.salary}</td>
+
+<td style="color:${trainer.salaryStatus === "Paid" ? "green" : "red"}">
+${trainer.salaryStatus}
+</td>
+
+<td>
+<button onclick="deleteTrainer(${index})">Delete</button>
+</td>
+
+`;
+
+            tableBody.appendChild(row);
+
+        });
+
+    }
+
+
+    // ADD TRAINER
+
+    trainerForm.addEventListener("submit", function (e) {
+
+        e.preventDefault();
+
+        let name = document.getElementById("trainerName").value.trim();
+        let phone = document.getElementById("trainerPhone").value;
+        let specialization = document.getElementById("trainerSpecialization").value;
+        let experience = document.getElementById("trainerExperience").value;
+        let capacity = document.getElementById("trainerCapacity").value;
+        let salary = document.getElementById("trainerSalary").value;
+        let salaryStatus = document.getElementById("salaryStatus").value;
+
+
+        // PREVENT DUPLICATE TRAINERS
+
+        let exists = trainers.find(
+            t => t.name.toLowerCase() === name.toLowerCase()
+        );
+
+        if (exists) {
+
+            alert("Trainer already exists");
+
+            return;
+
+        }
+
+
+        // ADD TRAINER OBJECT
+
+        trainers.push({
+
+            id: Date.now(),
+            name,
+            phone,
+            specialization,
+            experience,
+            capacity,
+            salary,
+            salaryStatus
+
+        });
+
+
+        // SAVE DATA
+
+        localStorage.setItem("trainers", JSON.stringify(trainers));
+
+        renderTrainers();
+
+        trainerForm.reset();
+
+    });
+
+
+    // DELETE TRAINER
+
+    window.deleteTrainer = function (index) {
+
+        trainers.splice(index, 1);
+
+        localStorage.setItem("trainers", JSON.stringify(trainers));
+
+        renderTrainers();
+
+    };
+
+
+    // INITIAL LOAD
+
+    renderTrainers();
+
+}
+
+// TRAINER ATTENDANCE MODULE
+
+const trainerSelectAttendance = document.getElementById("trainerSelectAttendance");
+
+if (trainerSelectAttendance) {
+
+    let trainers = JSON.parse(localStorage.getItem("trainers")) || [];
+
+    trainers.forEach(trainer => {
+
+        let option = document.createElement("option");
+
+        option.value = trainer.name;
+        option.textContent = trainer.name;
+
+        trainerSelectAttendance.appendChild(option);
+
+    });
+
+}
+
+
+function markTrainerAttendance() {
+
+    let trainerName = document.getElementById("trainerSelectAttendance").value;
+    let status = document.getElementById("trainerStatus").value;
+
+    if (trainerName === "") {
+
+        alert("Select a trainer");
+
+        return;
+
+    }
+
+    let attendance = JSON.parse(localStorage.getItem("trainerAttendance")) || [];
+
+    let today = new Date().toLocaleDateString();
+
+    let alreadyMarked = attendance.find(record =>
+        record.name === trainerName && record.date === today
+    );
+
+    if (alreadyMarked) {
+
+        alert("Attendance already marked today");
+
+        return;
+
+    }
+
+    let now = new Date();
+
+    attendance.push({
+
+        name: trainerName,
+        status: status,
+        date: today,
+        time: now.toLocaleTimeString()
+
+    });
+
+    localStorage.setItem("trainerAttendance", JSON.stringify(attendance));
+
+    renderTrainerAttendance();
+
+}
+
+
+function renderTrainerAttendance() {
+
+    let tableBody = document.querySelector("#trainerAttendanceTable tbody");
+
+    if (!tableBody) return;
+
+    tableBody.innerHTML = "";
+
+    let attendance = JSON.parse(localStorage.getItem("trainerAttendance")) || [];
+
+    attendance.forEach(record => {
+
+        let row = document.createElement("tr");
+
+        row.innerHTML = `
+
+<td>${record.name}</td>
+<td>${record.status}</td>
+<td>${record.date}</td>
+<td>${record.time}</td>
+
+`;
+
+        tableBody.appendChild(row);
+
+    });
+
+}
+
+renderTrainerAttendance();
+
+//STORE MODE
+
+const productForm = document.getElementById("productForm");
+
+if (productForm) {
+
+    let products = JSON.parse(localStorage.getItem("products")) || [];
+    let purchases = JSON.parse(localStorage.getItem("purchases")) || [];
+    let members = JSON.parse(localStorage.getItem("members")) || [];
+
+    const productsTable = document.querySelector("#productsTable tbody");
+    const purchaseTable = document.querySelector("#purchaseTable tbody");
+    const purchaseMember = document.getElementById("purchaseMember");
+    const purchaseProduct = document.getElementById("purchaseProduct");
+
+
+    // LOAD MEMBERS
+
+    members.forEach(member => {
+
+        let option = document.createElement("option");
+
+        option.value = member.name;
+        option.textContent = member.name;
+
+        purchaseMember.appendChild(option);
+
+    });
+
+
+    // LOAD PRODUCTS IN DROPDOWN
+
+    function loadProductsDropdown() {
+
+        purchaseProduct.innerHTML = '<option value="">Select Product</option>';
+
+        products.forEach(product => {
+
+            let option = document.createElement("option");
+
+            option.value = product.name;
+            option.textContent = product.name;
+
+            purchaseProduct.appendChild(option);
+
+        });
+
+    }
+
+
+    // RENDER PRODUCTS TABLE
+
+    function renderProducts() {
+
+        productsTable.innerHTML = "";
+
+        products.forEach(product => {
+
+            let row = document.createElement("tr");
+
+            row.innerHTML = `
+
+<td>${product.name}</td>
+<td>${product.category}</td>
+<td>₹${product.price}</td>
+<td>${product.stock}</td>
+
+`;
+
+            productsTable.appendChild(row);
+
+        });
+
+    }
+
+
+    // ADD PRODUCT
+
+    productForm.addEventListener("submit", function (e) {
+
+        e.preventDefault();
+
+        let name = document.getElementById("productName").value;
+        let price = document.getElementById("productPrice").value;
+        let stock = document.getElementById("productStock").value;
+        let category = document.getElementById("productCategory").value;
+
+
+        // prevent duplicate products
+
+        let exists = products.find(p => p.name === name);
+
+        if (exists) {
+
+            alert("Product already exists");
+
+            return;
+
+        }
+
+
+        products.push({
+
+            id: Date.now(),
+            name,
+            price,
+            stock,
+            category
+
+        });
+
+        localStorage.setItem("products", JSON.stringify(products));
+
+        renderProducts();
+
+        loadProductsDropdown();
+
+        productForm.reset();
+
+    });
+
+
+    // RECORD PURCHASE
+
+    function recordPurchase() {
+
+        let member = purchaseMember.value;
+        let productName = purchaseProduct.value;
+        let quantity = parseInt(document.getElementById("purchaseQuantity").value);
+
+        if (member === "" || productName === "") {
+
+            alert("Select member and product");
+
+            return;
+
+        }
+
+        let product = products.find(p => p.name === productName);
+
+        if (product.stock < quantity) {
+
+            alert("Not enough stock");
+
+            return;
+
+        }
+
+        product.stock -= quantity;
+
+        let total = product.price * quantity;
+
+        let today = new Date().toLocaleDateString();
+
+        purchases.push({
+
+            member,
+            product: productName,
+            quantity,
+            total,
+            date: today
+
+        });
+
+        localStorage.setItem("products", JSON.stringify(products));
+        localStorage.setItem("purchases", JSON.stringify(purchases));
+
+        renderProducts();
+        renderPurchases();
+
+    }
+
+
+    // RENDER PURCHASE TABLE
+
+    function renderPurchases() {
+
+        purchaseTable.innerHTML = "";
+
+        purchases.forEach(p => {
+
+            let row = document.createElement("tr");
+
+            row.innerHTML = `
+
+<td>${p.member}</td>
+<td>${p.product}</td>
+<td>${p.quantity}</td>
+<td>₹${p.total}</td>
+<td>${p.date}</td>
+
+`;
+
+            purchaseTable.appendChild(row);
+
+        });
+
+    }
+
+
+    renderProducts();
+    renderPurchases();
+    loadProductsDropdown();
 
 }

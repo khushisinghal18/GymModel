@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Trainer Management</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="sidebar">
+
+            <h2>Gym Admin</h2>
+
+            <ul>
+
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="members.html">Members</a></li>
+                <li><a href="attendance.html">Attendance</a></li>
+                <li><a href="trainerAttendance.html">Trainer Attendance</a></li>
+                <li><a href="payments.html">Payments</a></li>
+                <li><a href="trainers.html">Trainers</a></li>
+                <li><a href="plans.html">Plans</a></li>
+                <li><a href="store.html">Store</a></li>
+
+            </ul>
+
+        </div>
+
+        <div class="main">
+
+            <h1>Trainer Management</h1>
+
+            <form id="trainerForm">
+
+                <input type="text" id="trainerName" placeholder="Trainer Name" required>
+
+                <input type="text" id="trainerPhone" placeholder="Phone" required>
+
+                <select id="trainerSpecialization" required>
+
+                    <option value="">Select Specialization</option>
+                    <option value="Strength">Strength</option>
+                    <option value="Yoga">Yoga</option>
+                    <option value="Cardio">Cardio</option>
+                    <option value="Weight Loss">Weight Loss</option>
+                    <option value="Bodybuilding">Bodybuilding</option>
+
+                </select>
+
+                <input type="number" id="trainerExperience" placeholder="Experience (years)" required>
+
+                <input type="number" id="trainerCapacity" placeholder="Max Clients" required>
+
+                <input type="number" id="trainerSalary" placeholder="Salary" required>
+
+                <select id="salaryStatus">
+                    <option value="Unpaid">Salary Unpaid</option>
+                    <option value="Paid">Salary Paid</option>
+                </select>
+
+                <button type="submit">Add Trainer</button>
+
+            </form>
+
+
+            <table id="trainersTable">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Specialization</th>
+                        <th>Experience</th>
+                        <th>Capacity</th>
+                        <th>Assigned</th>
+                        <th>Assigned</th>
+                        <th>Salary</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <script src="../js/script.js"></script>
+
+</body>
+
+</html>
