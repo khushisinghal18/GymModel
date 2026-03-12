@@ -1,4 +1,18 @@
+// ADMIN PAGE PROTECTION
+
+if (window.location.pathname.includes("/admin/")) {
+
+    let role = localStorage.getItem("role");
+
+    if (role !== "admin") {
+
+        window.location.href = "../index.html";
+
+    }
+
+}
 // LOGIN SYSTEM
+
 
 const loginForm = document.getElementById("loginForm");
 
@@ -8,25 +22,40 @@ if (loginForm) {
 
         e.preventDefault();
 
-        let username = document.getElementById("username").value;
-        let password = document.getElementById("password").value;
+        let username = document.getElementById("username").value.trim();
+        let password = document.getElementById("password").value.trim();
 
+
+        // ADMIN LOGIN
         if (username === "admin" && password === "1234") {
 
             window.location.href = "admin/dashboard.html";
 
-        }
-
-        else {
-
-            alert("Invalid Login");
+            return;
 
         }
+
+
+        // MEMBER LOGIN
+        let members = JSON.parse(localStorage.getItem("members")) || [];
+
+        let member = members.find(m => String(m.phone) === username);
+
+        if (member) {
+
+            localStorage.setItem("loggedMember", JSON.stringify(member));
+
+            window.location.href = "member/dashboard.html";
+
+            return;
+
+        }
+
+        alert("Invalid Login");
 
     });
 
 }
-
 
 // MEMBER SYSTEM
 
@@ -1182,4 +1211,144 @@ if (productForm) {
     renderPurchases();
     loadProductsDropdown();
 
+
 }
+
+// DASHBOARD TRAINER COUNT
+
+const trainerCount = document.getElementById("trainerCount");
+
+if (trainerCount) {
+
+    let trainers = JSON.parse(localStorage.getItem("trainers")) || [];
+
+    trainerCount.textContent = trainers.length;
+
+}
+// MEMBER DASHBOARD
+
+const welcome = document.getElementById("welcome");
+
+if (welcome) {
+
+    let member = JSON.parse(localStorage.getItem("loggedMember"));
+
+    if (member) {
+
+        document.getElementById("welcome").innerText = "Welcome " + member.name;
+
+        document.getElementById("memberPlan").innerText = member.plan;
+
+        document.getElementById("memberTrainer").innerText =
+            member.trainer || "Not Assigned";
+
+        document.getElementById("memberStart").innerText = member.startDate;
+
+        document.getElementById("memberEnd").innerText = member.endDate;
+
+    }
+
+
+    // ATTENDANCE HISTORY
+
+    let attendance = JSON.parse(localStorage.getItem("attendance")) || [];
+
+    let attendanceTable =
+        document.querySelector("#memberAttendance tbody");
+
+    attendance
+        .filter(a => a.name === member.name)
+        .forEach(a => {
+
+            let row = document.createElement("tr");
+
+            row.innerHTML = `
+<td>${a.date}</td>
+<td>${a.status}</td>
+`;
+
+            attendanceTable.appendChild(row);
+
+        });
+
+
+    // PAYMENT HISTORY
+
+    let payments = JSON.parse(localStorage.getItem("payments")) || [];
+
+    let paymentTable =
+        document.querySelector("#memberPayments tbody");
+
+    payments
+        .filter(p => p.member === member.name)
+        .forEach(p => {
+
+            let row = document.createElement("tr");
+
+            row.innerHTML = `
+<td>${p.month}</td>
+<td>₹${p.amount}</td>
+<td>${p.status}</td>
+<td>₹${p.due}</td>
+`;
+
+            paymentTable.appendChild(row);
+
+        });
+
+}
+
+function logout() {
+
+    localStorage.removeItem("loggedMember");
+    localStorage.removeItem("role");
+
+    window.location.href = "../index.html";
+
+}
+
+// MEMBER STORE PURCHASES
+
+let purchases = JSON.parse(localStorage.getItem("purchases")) || [];
+
+let purchaseTable =
+    document.querySelector("#memberPurchases tbody");
+
+if (purchaseTable) {
+
+    purchases
+        .filter(p => p.member === member.name)
+        .forEach(p => {
+
+            let row = document.createElement("tr");
+
+            row.innerHTML = `
+<td>${p.product}</td>
+<td>${p.quantity}</td>
+<td>₹${p.total}</td>
+<td>${p.date}</td>
+`;
+
+            purchaseTable.appendChild(row);
+
+        });
+
+}
+let today = new Date();
+let endDate = new Date(member.endDate);
+
+let diffTime = endDate - today;
+
+let daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+let status = "Active";
+
+if (daysLeft < 0) {
+    status = "Expired";
+}
+
+else if (daysLeft <= 7) {
+    status = "Expiring Soon";
+}
+
+document.getElementById("memberStatus").innerText = status;

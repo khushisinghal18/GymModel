@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Member Dashboard</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="sidebar">
+
+            <h2>Member Panel</h2>
+
+            <ul>
+
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="#" onclick="logout()">Logout</a></li>
+
+            </ul>
+
+        </div>
+
+        <div class="main">
+
+            <h1 id="welcome"></h1>
+
+            <div class="cards">
+
+                <div class="card">
+                    <h3>Plan</h3>
+                    <p id="memberPlan"></p>
+                </div>
+
+                <div class="card">
+                    <h3>Trainer</h3>
+                    <p id="memberTrainer"></p>
+                </div>
+
+                <div class="card">
+                    <h3>Start Date</h3>
+                    <p id="memberStart"></p>
+                </div>
+
+                <div class="card">
+                    <h3>Expiry</h3>
+                    <p id="memberEnd"></p>
+                </div>
+                <div class="card">
+                    <h3>Status</h3>
+                    <p id="memberStatus"></p>
+                </div>
+
+            </div>
+
+
+            <h2>Attendance History</h2>
+
+            <table id="memberAttendance">
+
+                <thead>
+
+                    <tr>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                </tbody>
+
+            </table>
+
+
+            <h2>Payment History</h2>
+            <h2>Store Purchases</h2>
+
+            <table id="memberPurchases">
+
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+
+                <tbody></tbody>
+
+            </table>
+            <table id="memberPayments">
+
+                <thead>
+
+                    <tr>
+                        <th>Month</th>
+                        <th>Amount Paid</th>
+                        <th>Status</th>
+                        <th>Due</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <script src="../js/script.js"></script>
+
+</body>
+
+</html>
