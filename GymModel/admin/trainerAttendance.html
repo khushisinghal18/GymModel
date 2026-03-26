@@ -54,7 +54,21 @@
             <button onclick="markTrainerAttendance()">Submit</button>
 
             <h3>Attendance Records</h3>
-
+            <select id="monthFilter">
+                <option value="">All Months</option>
+                <option value="0">Jan</option>
+                <option value="1">Feb</option>
+                <option value="2">Mar</option>
+                <option value="3">Apr</option>
+                <option value="4">May</option>
+                <option value="5">Jun</option>
+                <option value="6">Jul</option>
+                <option value="7">Aug</option>
+                <option value="8">Sep</option>
+                <option value="9">Oct</option>
+                <option value="10">Nov</option>
+                <option value="11">Dec</option>
+            </select>
             <table id="trainerAttendanceTable">
 
                 <thead>
@@ -79,8 +93,11 @@
         </div>
 
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/trainers.js"></script>
+    <script src="../js/trainerAttendance.js"></script>
 
-    <script src="../js/script.js"></script>
 
 </body>
 

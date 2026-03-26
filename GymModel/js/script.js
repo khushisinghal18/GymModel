@@ -1,4 +1,4 @@
-// ADMIN PAGE PROTECTION
+/*  ADMIN PAGE PROTECTION
 
 if (window.location.pathname.includes("/admin/")) {
 
@@ -28,6 +28,8 @@ if (loginForm) {
 
         // ADMIN LOGIN
         if (username === "admin" && password === "1234") {
+
+            localStorage.setItem("role", "admin");
 
             window.location.href = "admin/dashboard.html";
 
@@ -1351,4 +1353,4 @@ else if (daysLeft <= 7) {
     status = "Expiring Soon";
 }
 
-document.getElementById("memberStatus").innerText = status;
+document.getElementById("memberStatus").innerText = status;*/
