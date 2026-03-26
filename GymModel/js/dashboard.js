@@ -1,12 +1,11 @@
-// ============================================================
-// DASHBOARD.JS — SUPABASE VERSION (FINAL)
-// ============================================================
+// DASHBOARD
 
 document.addEventListener("DOMContentLoaded", async function () {
 
     // ---------------- FETCH DATA ----------------
     const { data: members } = await supabaseClient.from("members").select("*");
     const { data: payments } = await supabaseClient.from("payments").select("*");
+    const { data: purchases } = await supabaseClient.from("purchases").select("*");
     const { data: attendance } = await supabaseClient.from("attendance").select("*");
     const { data: trainers } = await supabaseClient.from("trainers").select("*");
 
@@ -52,9 +51,22 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         let totalRevenue = 0;
 
+        // 💰 MEMBERSHIP REVENUE
         payments?.forEach(payment => {
             if (payment.month === month && payment.year === year) {
                 totalRevenue += payment.amount || 0;
+            }
+        });
+
+        // 🛒 STORE REVENUE
+        purchases?.forEach(p => {
+
+            let parts = p.date.split("/");
+            let pMonth = parseInt(parts[1]) - 1;
+            let currentMonth = new Date().getMonth();
+
+            if (pMonth === currentMonth) {
+                totalRevenue += p.total || 0;
             }
         });
 

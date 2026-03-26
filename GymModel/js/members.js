@@ -1,7 +1,4 @@
-// ============================================================
-// MEMBERS.JS — CLEAN FINAL (Supabase + Dropdown FIXED)
-// ============================================================
-
+// MEMBERS
 const memberForm = document.getElementById("memberForm");
 
 if (memberForm) {

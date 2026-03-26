@@ -1,125 +1,199 @@
-// ============================================================
-// STORE.JS — Products inventory + member purchases
-// ============================================================
+// STORE
 
 const productForm = document.getElementById("productForm");
 
-if (productForm) {
-    let products = JSON.parse(localStorage.getItem("products")) || [];
-    let purchases = JSON.parse(localStorage.getItem("purchases")) || [];
-    let members = JSON.parse(localStorage.getItem("members")) || [];
+let products = [];
+let members = [];
 
-    const productsTable = document.querySelector("#productsTable tbody");
-    const purchaseTable = document.querySelector("#purchaseTable tbody");
-    const purchaseMember = document.getElementById("purchaseMember");
-    const purchaseProduct = document.getElementById("purchaseProduct");
+// ---------------- LOAD PRODUCTS ----------------
+async function loadProducts() {
 
-    // Load member dropdown
-    members.forEach(member => {
-        let option = document.createElement("option");
-        option.value = member.name;
-        option.textContent = member.name;
-        purchaseMember.appendChild(option);
+    const { data, error } = await supabaseClient
+        .from("products")
+        .select("*");
+
+    if (error) {
+        alert(error.message);
+        return;
+    }
+
+    products = data || [];
+
+    let table = document.querySelector("#productsTable tbody");
+    table.innerHTML = "";
+
+    products.forEach(p => {
+
+        let row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${p.name}</td>
+            <td>${p.category}</td>
+            <td>₹${p.price}</td>
+            <td>${p.stock}</td>
+        `;
+
+        table.appendChild(row);
     });
 
-    // Load product dropdown
-    function loadProductsDropdown() {
-        purchaseProduct.innerHTML = '<option value="">Select Product</option>';
-        products.forEach(product => {
-            let option = document.createElement("option");
-            option.value = product.name;
-            option.textContent = product.name;
-            purchaseProduct.appendChild(option);
-        });
-    }
+    loadProductDropdown();
+}
 
-    // --- Render products table ---
-    function renderProducts() {
-        productsTable.innerHTML = "";
-        products.forEach(product => {
-            let row = document.createElement("tr");
-            row.innerHTML = `
-                <td>${product.name}</td>
-                <td>${product.category}</td>
-                <td>₹${product.price}</td>
-                <td>${product.stock}</td>
-            `;
-            productsTable.appendChild(row);
-        });
-    }
+// ---------------- LOAD MEMBERS ----------------
+async function loadMembers() {
 
-    // --- Add product ---
-    productForm.addEventListener("submit", function (e) {
+    const { data } = await supabaseClient
+        .from("members")
+        .select("*");
+
+    members = data || [];
+
+    let select = document.getElementById("purchaseMember");
+
+    select.innerHTML = "<option value=''>Select Member</option>";
+
+    members.forEach(m => {
+        let option = document.createElement("option");
+        option.value = m.name;
+        option.textContent = m.name;
+        select.appendChild(option);
+    });
+}
+
+// ---------------- PRODUCT DROPDOWN ----------------
+function loadProductDropdown() {
+
+    let select = document.getElementById("purchaseProduct");
+
+    select.innerHTML = "<option value=''>Select Product</option>";
+
+    products.forEach(p => {
+        let option = document.createElement("option");
+        option.value = p.name;
+        option.textContent = p.name;
+        select.appendChild(option);
+    });
+}
+
+// ---------------- ADD PRODUCT ----------------
+if (productForm) {
+
+    productForm.addEventListener("submit", async function (e) {
+
         e.preventDefault();
 
-        let name = document.getElementById("productName").value;
-        let price = document.getElementById("productPrice").value;
-        let stock = document.getElementById("productStock").value;
+        let name = document.getElementById("productName").value.trim();
+        let price = parseInt(document.getElementById("productPrice").value);
+        let stock = parseInt(document.getElementById("productStock").value);
         let category = document.getElementById("productCategory").value;
 
-        let exists = products.find(p => p.name === name);
+        if (!name || !price || !stock) {
+            alert("Fill all fields");
+            return;
+        }
+
+        let exists = products.find(p => p.name.toLowerCase() === name.toLowerCase());
+
         if (exists) {
             alert("Product already exists");
             return;
         }
 
-        products.push({ id: Date.now(), name, price, stock, category });
+        const { error } = await supabaseClient
+            .from("products") // ✅ FIXED
+            .insert([{ name, price, stock, category }]);
 
-        localStorage.setItem("products", JSON.stringify(products));
-        renderProducts();
-        loadProductsDropdown();
+        if (error) {
+            alert(error.message);
+            return;
+        }
+
+        alert("Product Added ✅");
+
         productForm.reset();
+        loadProducts();
     });
+}
 
-    // --- Record purchase ---
-    window.recordPurchase = function () {
-        let member = purchaseMember.value;
-        let productName = purchaseProduct.value;
-        let quantity = parseInt(document.getElementById("purchaseQuantity").value);
+// ---------------- PURCHASE ----------------
+window.recordPurchase = async function () {
 
-        if (member === "" || productName === "") {
-            alert("Select member and product");
-            return;
-        }
+    let member = document.getElementById("purchaseMember").value;
+    let product = document.getElementById("purchaseProduct").value;
+    let quantity = parseInt(document.getElementById("purchaseQuantity").value);
 
-        let product = products.find(p => p.name === productName);
-
-        if (product.stock < quantity) {
-            alert("Not enough stock");
-            return;
-        }
-
-        product.stock -= quantity;
-
-        let total = product.price * quantity;
-        let today = new Date().toLocaleDateString();
-
-        purchases.push({ member, product: productName, quantity, total, date: today });
-
-        localStorage.setItem("products", JSON.stringify(products));
-        localStorage.setItem("purchases", JSON.stringify(purchases));
-
-        renderProducts();
-        renderPurchases();
-    };
-
-    // --- Render purchases table ---
-    function renderPurchases() {
-        purchaseTable.innerHTML = "";
-        purchases.forEach(p => {
-            let row = document.createElement("tr");
-            row.innerHTML = `
-                <td>${p.member}</td>
-                <td>${p.product}</td>
-                <td>${p.quantity}</td>
-                <td>₹${p.total}</td>
-                <td>${p.date}</td>
-            `;
-            purchaseTable.appendChild(row);
-        });
+    if (!member || !product || !quantity) {
+        alert("Fill all fields");
+        return;
     }
 
-    renderProducts();
-    renderPurchases();
-    loadProductsDropdown();
+    let productData = products.find(p => p.name === product);
+
+    if (!productData) return;
+
+    if (quantity > productData.stock) {
+        alert("Not enough stock");
+        return;
+    }
+
+    let total = productData.price * quantity;
+    let today = new Date().toLocaleDateString();
+
+    // INSERT PURCHASE
+    await supabaseClient.from("purchases").insert([{
+        member,
+        product,
+        quantity,
+        total,
+        date: today
+    }]);
+
+    // UPDATE STOCK
+    await supabaseClient
+        .from("products")
+        .update({ stock: productData.stock - quantity })
+        .eq("id", productData.id);
+
+    alert("Purchase recorded ✅");
+
+    loadProducts();
+    loadPurchases();
+};
+
+// ---------------- LOAD PURCHASES ----------------
+async function loadPurchases() {
+
+    const { data, error } = await supabaseClient
+        .from("purchases") // ✅ FIXED
+        .select("*");
+
+    if (error) {
+        alert(error.message);
+        return;
+    }
+
+    let table = document.querySelector("#purchaseTable tbody");
+    table.innerHTML = "";
+
+    data.forEach(p => {
+
+        let row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${p.member}</td>
+            <td>${p.product}</td>
+            <td>${p.quantity}</td>
+            <td>₹${p.total}</td>
+            <td>${p.date}</td>
+        `;
+
+        table.appendChild(row);
+    });
 }
+
+// ---------------- INIT ----------------
+document.addEventListener("DOMContentLoaded", async () => {
+    await loadProducts();
+    await loadMembers();
+    await loadPurchases();
+});

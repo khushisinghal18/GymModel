@@ -1,6 +1,6 @@
-// ============================================================
-// TRAINERS.JS — FINAL CLEAN (NO BUGS)
-// ============================================================
+
+// TRAINERS
+
 
 const trainerForm = document.getElementById("trainerForm");
 const tableBody = document.querySelector("#trainersTable tbody");

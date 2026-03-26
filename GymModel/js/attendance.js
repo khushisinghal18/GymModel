@@ -1,6 +1,4 @@
-// ============================================================
-// ATTENDANCE.JS — SUPABASE VERSION (MEMBERS)
-// ============================================================
+// ATTENDANCE
 
 const memberSelect = document.getElementById("memberSelect");
 
@@ -26,7 +24,7 @@ async function loadMemberDropdown() {
     });
 }
 
-// ---------------- MARK ATTENDANCE ----------------
+//  MARK ATTENDANCE 
 async function markAttendance() {
 
     let memberName = document.getElementById("memberSelect").value;
@@ -72,7 +70,7 @@ async function markAttendance() {
     loadAttendance();
 }
 
-// ---------------- RENDER TABLE ----------------
+//  RENDER TABLE 
 async function loadAttendance() {
 
     const { data, error } = await supabaseClient
@@ -112,7 +110,7 @@ async function loadAttendance() {
     });
 }
 
-// ---------------- INIT ----------------
+//  INIT 
 document.addEventListener("DOMContentLoaded", async () => {
     await loadMemberDropdown();
     await loadAttendance();

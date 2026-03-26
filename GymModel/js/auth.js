@@ -1,6 +1,4 @@
-// ============================================================
-// AUTH.JS — Login system & admin page protection
-// ============================================================
+// AUTH — Login system & admin page protection
 
 // ADMIN PAGE PROTECTION
 if (window.location.pathname.includes("/admin/")) {

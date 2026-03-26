@@ -1,6 +1,5 @@
-// ============================================================
-// TRAINER ATTENDANCE — FINAL WORKING
-// ============================================================
+
+// TRAINER ATTENDANCE
 
 // ---------------- LOAD TRAINERS ----------------
 async function loadTrainerDropdown() {

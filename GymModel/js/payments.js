@@ -1,6 +1,4 @@
-// ============================================================
-// PAYMENTS.JS — FINAL SUPABASE VERSION
-// ============================================================
+// PAYMENTS
 
 const paymentForm = document.getElementById("paymentForm");
 
